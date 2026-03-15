@@ -3,334 +3,319 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>iOS Style VPN Manager</title>
+    <title>iOS VPN Admin</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <style>
-        /* အစ်ကို့ရဲ့ မူရင်း iOS Style CSS များ */
+        /* --- iOS Glassmorphism Style --- */
         :root {
-            --ios-blur: blur(40px) saturate(180%);
+            --ios-blur: blur(35px) saturate(160%);
             --ios-blue: #007AFF;
             --ios-red: #FF3B30;
-            --glass-bg: rgba(255, 255, 255, 0.08);
+            --ios-green: #34C759;
+            --glass-bg: rgba(255, 255, 255, 0.1);
             --glass-border: rgba(255, 255, 255, 0.2);
         }
 
         body {
-            margin: 0;
+            margin: 0; padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
             background: #000;
-            color: white;
+            color: #fff;
             min-height: 100vh;
-            background: radial-gradient(circle at top right, #1e1b4b, #020617);
+            /* iOS Gradient Background */
+            background: radial-gradient(at 0% 0%, #1a1a2e 0%, transparent 50%),
+                        radial-gradient(at 100% 0%, #16213e 0%, transparent 50%),
+                        radial-gradient(at 50% 100%, #0f3460 0%, transparent 100%),
+                        #020617;
         }
 
-        .container { padding: 20px; max-width: 900px; margin: auto; }
+        .container { padding: 20px; max-width: 800px; margin: auto; }
 
-        /* iOS Glassmorphism Panel */
+        /* --- LOGIN PAGE STYLE --- */
+        #loginPage {
+            height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            backdrop-filter: blur(20px);
+        }
+        .login-box {
+            text-align: center; background: var(--glass-bg); padding: 40px 30px;
+            border-radius: 40px; border: 1px solid var(--glass-border); width: 85%; max-width: 320px;
+        }
+        .pass-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid #fff; display: inline-block; margin: 5px; }
+        .pass-dot.active { background: #fff; }
+
+        /* --- DASHBOARD STYLE --- */
         .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: var(--ios-blur);
-            -webkit-backdrop-filter: var(--ios-blur);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 20px;
-            margin-bottom: 20px;
+            background: var(--glass-bg); backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur);
+            border: 1px solid var(--glass-border); border-radius: 30px; padding: 25px; margin-bottom: 20px;
         }
 
-        /* အစ်ကို့ရဲ့ Glossy Buttons များ */
+        /* --- BUTTONS --- */
         .glass-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--glass-border);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 14px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.2s;
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            background: rgba(255, 255, 255, 0.12); border: 1px solid var(--glass-border);
+            color: white; padding: 14px 22px; border-radius: 18px; font-weight: 600; cursor: pointer;
+            transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
         }
-
+        .glass-btn:active { transform: scale(0.95); opacity: 0.8; }
         .btn-blue { background: var(--ios-blue); border: none; }
-        .btn-cyan { background: rgba(0, 255, 255, 0.15) !important; border: 1px solid rgba(0, 255, 255, 0.5) !important; color: #00ffff !important; }
-        .btn-pink { background: rgba(255, 105, 180, 0.15) !important; border: 1px solid rgba(255, 105, 180, 0.5) !important; color: #ff69b4 !important; }
-        .btn-red-glossy { background: linear-gradient(180deg, #ff5f57, #ff3b30); border: none; box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3); }
-
+        .btn-red-glossy { background: linear-gradient(180deg, #ff5f57, #ff3b30); border: none; }
+        .btn-cyan { background: rgba(0, 255, 255, 0.15); border: 1px solid rgba(0, 255, 255, 0.5); color: #00ffff; }
+        .btn-pink { background: rgba(255, 105, 180, 0.15); border: 1px solid rgba(255, 105, 180, 0.5); color: #ff69b4; }
         .full-btn { width: 100%; margin-top: 10px; }
 
-        /* Table Styling */
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-            border-radius: 16px;
-            margin-top: 15px;
-        }
+        /* --- TABLE --- */
+        .table-responsive { width: 100%; overflow-x: auto; border-radius: 20px; background: rgba(0,0,0,0.2); }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; }
+        th { padding: 15px; background: rgba(255,255,255,0.05); color: var(--ios-blue); font-size: 13px; text-transform: uppercase; }
+        td { padding: 14px; border-bottom: 1px solid rgba(255,255,255,0.08); text-align: center; font-size: 14px; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(255, 255, 255, 0.03);
-            min-width: 500px;
-        }
-
-        th { background: rgba(255, 255, 255, 0.05); padding: 12px; text-align: center; font-size: 13px; color: var(--ios-blue); }
-        td { padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: center; font-size: 14px; }
-
-        /* Modal / Alert Styling */
+        /* --- MODAL --- */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 1000;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(15px);
+            display: none; align-items: center; justify-content: center; z-index: 1000;
         }
-
         .modal-box {
-            background: rgba(30, 30, 30, 0.85);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 24px; padding: 25px; width: 90%; max-width: 340px; text-align: center;
+            background: rgba(30, 30, 30, 0.9); border: 1px solid var(--glass-border);
+            border-radius: 35px; padding: 30px; width: 90%; max-width: 350px; text-align: center;
         }
-
         input {
-            width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            padding: 12px; border-radius: 12px; color: white; margin-bottom: 10px; outline: none;
+            width: 100%; background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);
+            padding: 14px; border-radius: 15px; color: white; margin-bottom: 12px; outline: none; font-size: 16px;
         }
-
-        .qr-holder { background: white; padding: 10px; border-radius: 15px; display: inline-block; margin: 15px 0; }
+        .qr-holder { background: white; padding: 12px; border-radius: 20px; display: inline-block; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div id="mainPage">
-        <div class="glass-panel" style="text-align: center;">
-            <h2 style="margin-bottom: 25px;">VPN Dashboard</h2>
-            <div style="display: flex; justify-content: space-around; margin-bottom: 25px;">
-                <div><span id="statKeys" style="font-size: 32px; font-weight: bold; color: #00ff00;">0</span><br><small>Total Keys</small></div>
-                <div><span id="statLogs" style="font-size: 32px; font-weight: bold; color: #ff3b30;">0</span><br><small>Total Logs</small></div>
+    <div id="loginPage">
+        <div class="login-box">
+            <i class="bi bi-shield-lock-fill" style="font-size: 50px; color: var(--ios-blue);"></i>
+            <h2 style="margin: 15px 0;">Admin Login</h2>
+            <div id="passDots" style="margin-bottom: 20px;">
+                <span class="pass-dot"></span><span class="pass-dot"></span><span class="pass-dot"></span><span class="pass-dot"></span>
             </div>
-            <button onclick="showAdmin()" class="glass-btn btn-blue full-btn">ADMIN PANEL</button>
+            <input type="password" id="adminPin" placeholder="Enter PIN" maxlength="4" style="text-align: center; letter-spacing: 10px;" oninput="checkPin(this)">
         </div>
     </div>
 
-    <div id="adminPage" style="display:none;">
-        <div class="glass-panel">
-            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <button onclick="showHome()" class="glass-btn"><i class="bi bi-arrow-left"></i> BACK</button>
-                <div>
-                    <button onclick="exportData()" class="glass-btn btn-pink">Export</button>
-                    <button onclick="document.getElementById('importFile').click()" class="glass-btn btn-cyan">Import</button>
-                    <input type="file" id="importFile" style="display:none" onchange="importData(event)">
+    <div id="mainContent" style="display: none;">
+        <div class="container">
+            <div class="glass-panel" style="text-align: center;">
+                <h3 style="margin-top:0;">VPN MANAGER PRO</h3>
+                <div style="display: flex; justify-content: space-around; margin: 20px 0;">
+                    <div><span id="statKeys" style="font-size: 35px; font-weight: bold; color: var(--ios-green);">0</span><br><small>Active Keys</small></div>
+                    <div><span id="statLogs" style="font-size: 35px; font-weight: bold; color: var(--ios-red);">0</span><br><small>Usage Logs</small></div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="document.getElementById('importFile').click()" class="glass-btn btn-cyan" style="flex:1;">IMPORT</button>
+                    <button onclick="exportData()" class="glass-btn btn-pink" style="flex:1;">EXPORT</button>
+                </div>
+                <input type="file" id="importFile" style="display:none" onchange="importData(event)">
+            </div>
+
+            <div class="glass-panel">
+                <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 15px;">
+                    <h4 style="margin:0;">AVAILABLE KEYS</h4>
+                    <button onclick="openAddKeyModal()" class="glass-btn btn-blue" style="padding: 8px 15px; font-size: 12px;">+ ADD NEW</button>
+                </div>
+                <div id="keys-list" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+            </div>
+
+            <div class="glass-panel">
+                <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 15px;">
+                    <h4 style="margin:0;">SYSTEM LOGS</h4>
+                    <input type="text" id="searchBox" placeholder="Search..." onkeyup="renderLogs()" style="width: 120px; margin:0; padding: 8px;">
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr><th>Date</th><th>Key</th><th>User</th><th>Duration</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="logs-body"></tbody>
+                    </table>
                 </div>
             </div>
-
-            <h5 style="color: var(--ios-blue);">AVAILABLE KEYS</h5>
-            <div id="keys-container" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px;"></div>
-
-            <div style="display:flex; justify-content: space-between; align-items: center;">
-                <h5>USAGE LOGS</h5>
-                <input type="text" id="searchBox" placeholder="Search..." onkeyup="renderLogs()" style="width: 120px; margin: 0; padding: 5px 10px;">
-            </div>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr><th>DATE</th><th>KEY</th><th>USER</th><th>TIME</th><th>ACTION</th></tr>
-                    </thead>
-                    <tbody id="logs-body"></tbody>
-                </table>
-            </div>
         </div>
     </div>
-</div>
 
-<div id="keyModal" class="modal-overlay" onclick="closeModal()">
-    <div class="modal-box" onclick="event.stopPropagation()">
-        <h3 id="modalKeyName" style="color: var(--ios-blue); margin: 0;"></h3>
-        <div class="qr-holder"><div id="qrcode"></div></div>
-        
-        <div style="display:flex; justify-content: space-between; font-size: 13px; margin-bottom: 15px;">
-            <span>Limit: <b id="mTotal"></b></span>
-            <span>Used: <b id="mUsed"></b></span>
-            <span>Left: <b id="mLeft" style="color: #00ff00;"></b></span>
+    <div id="keyModal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <h3 id="modalKeyName" style="color: var(--ios-blue); margin-bottom: 5px;"></h3>
+            <div class="qr-holder"><div id="qrcode"></div></div>
+            
+            <div style="display: flex; justify-content: space-around; font-size: 13px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 15px; margin-bottom: 15px;">
+                <div>Limit: <b id="mLimit"></b></div>
+                <div>Used: <b id="mUsed"></b></div>
+                <div>Left: <b id="mLeft" style="color: var(--ios-green);"></b></div>
+            </div>
+
+            <input type="text" id="regUser" placeholder="Enter User Name">
+            <input type="text" id="regTime" placeholder="Duration (e.g. 30 Days)">
+            <button onclick="saveUsage()" class="glass-btn btn-blue full-btn">REGISTER USAGE</button>
+            <button onclick="deleteKey()" class="glass-btn btn-red-glossy full-btn" style="margin-top: 10px;">DELETE KEY</button>
         </div>
-
-        <input type="text" id="userName" placeholder="User Name">
-        <input type="text" id="duration" placeholder="Duration (e.g. 1 Month)">
-        <button onclick="saveLog()" class="glass-btn btn-blue full-btn">REGISTER USAGE</button>
-        <button onclick="deleteKey()" class="glass-btn btn-red-glossy full-btn" style="margin-top: 15px;">DELETE KEY</button>
     </div>
-</div>
 
-<script>
-    let keys = JSON.parse(localStorage.getItem('vpn_keys')) || [];
-    let logs = JSON.parse(localStorage.getItem('vpn_logs')) || [];
-    let activeKeyId = null;
+    <script>
+        const PIN_CODE = "1234"; // Login PIN
+        let keys = JSON.parse(localStorage.getItem('vpn_keys_pro')) || [];
+        let logs = JSON.parse(localStorage.getItem('vpn_logs_pro')) || [];
+        let activeKeyId = null;
 
-    // အစ်ကို့ရဲ့ iosAlert မူရင်း Function
-    function iosAlert(title, msg) {
-        alert(title + "\n\n" + msg); // ရိုးရှင်းအောင် alert သုံးထားပါတယ်၊ လိုအပ်ရင် modal နဲ့ ပြောင်းလို့ရပါတယ်
-    }
+        // ၁။ Login Logic
+        function checkPin(el) {
+            let dots = document.querySelectorAll('.pass-dot');
+            for(let i=0; i<4; i++) dots[i].classList.toggle('active', i < el.value.length);
+            
+            if(el.value === PIN_CODE) {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                renderAll();
+            } else if(el.value.length >= 4) {
+                el.value = "";
+                dots.forEach(d => d.classList.remove('active'));
+                alert("Incorrect PIN!");
+            }
+        }
 
-    function showAdmin() { 
-        document.getElementById('mainPage').style.display = 'none';
-        document.getElementById('adminPage').style.display = 'block';
-        renderAll();
-    }
+        // ၂။ Render Functions
+        function renderAll() {
+            const kList = document.getElementById('keys-list');
+            kList.innerHTML = '';
+            keys.forEach(k => {
+                let btn = document.createElement('button');
+                btn.className = 'glass-btn';
+                btn.style.borderLeft = `4px solid ${k.used >= k.limit ? '#ff3b30' : '#34c759'}`;
+                btn.innerHTML = `<i class="bi bi-vpn-key"></i> ${k.name} <small>(${k.used}/${k.limit})</small>`;
+                btn.onclick = () => openKey(k.id);
+                kList.appendChild(btn);
+            });
+            renderLogs();
+            updateStats();
+        }
 
-    function showHome() {
-        document.getElementById('adminPage').style.display = 'none';
-        document.getElementById('mainPage').style.display = 'block';
-        updateStats();
-    }
+        function updateStats() {
+            document.getElementById('statKeys').innerText = keys.length;
+            document.getElementById('statLogs').innerText = logs.length;
+        }
 
-    function updateStats() {
-        document.getElementById('statKeys').innerText = keys.length;
-        document.getElementById('statLogs').innerText = logs.length;
-    }
+        function openKey(id) {
+            activeKeyId = id;
+            let k = keys.find(x => x.id === id);
+            document.getElementById('modalKeyName').innerText = k.name;
+            document.getElementById('mLimit').innerText = k.limit;
+            document.getElementById('mUsed').innerText = k.used;
+            document.getElementById('mLeft').innerText = k.limit - k.used;
+            document.getElementById('qrcode').innerHTML = "";
+            new QRCode(document.getElementById("qrcode"), { text: k.content, width: 140, height: 140 });
+            document.getElementById('keyModal').style.display = 'flex';
+        }
 
-    function renderAll() {
-        const kContainer = document.getElementById('keys-container');
-        kContainer.innerHTML = '';
-        keys.forEach(k => {
-            let btn = document.createElement('button');
-            btn.className = 'glass-btn';
-            btn.innerHTML = `<i class="bi bi-key"></i> ${k.name} (${k.used}/${k.limit})`;
-            btn.onclick = () => openKey(k.id);
-            kContainer.appendChild(btn);
-        });
-        renderLogs();
-    }
+        // ၃။ Register Usage (အပိုင်း ၁ မူရင်း)
+        function saveUsage() {
+            let user = document.getElementById('regUser').value;
+            let time = document.getElementById('regTime').value;
+            if(!user || !time) return;
 
-    function openKey(id) {
-        activeKeyId = id;
-        let k = keys.find(x => x.id === id);
-        document.getElementById('modalKeyName').innerText = k.name;
-        document.getElementById('mTotal').innerText = k.limit;
-        document.getElementById('mUsed').innerText = k.used;
-        document.getElementById('mLeft').innerText = k.limit - k.used;
-        
-        document.getElementById('qrcode').innerHTML = "";
-        new QRCode(document.getElementById("qrcode"), { text: k.content, width: 150, height: 150 });
-        
-        document.getElementById('keyModal').style.display = 'flex';
-    }
+            let k = keys.find(x => x.id === activeKeyId);
+            if(k.used >= k.limit) return alert("Key limit reached!");
 
-    function saveLog() {
-        let user = document.getElementById('userName').value;
-        let time = document.getElementById('duration').value;
-        if(!user || !time) return;
+            k.used++;
+            logs.push({
+                id: Date.now(),
+                date: new Date().toLocaleDateString('en-GB'),
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                key: k.name,
+                user: user,
+                duration: time
+            });
+            saveData();
+            closeModal();
+        }
 
-        let k = keys.find(x => x.id === activeKeyId);
-        if(k.used >= k.limit) return iosAlert("⚠️ Limit Full", "This key has reached its limit.");
+        // ၄။ Import Data (အပိုင်း ၂ မူရင်း)
+        function importData(event) {
+            let file = event.target.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let lines = e.target.result.split("\n");
+                let addedLogs = 0, addedKeys = 0;
+                let header = lines[0].toLowerCase();
 
-        k.used++;
-        logs.push({
-            id: Date.now(),
-            date: new Date().toLocaleDateString('en-GB'),
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            key: k.name,
-            user: user,
-            duration: time
-        });
-
-        saveData();
-        closeModal();
-    }
-
-    // --- အပိုင်း ၂ (Import Logic) အစ်ကိုပို့ထားတဲ့ ကုဒ်အတိုင်း ---
-    function importData(event) {
-        let file = event.target.files[0];
-        if (!file) return;
-        let reader = new FileReader();
-        reader.onload = function(e) {
-            let content = e.target.result;
-            let lines = content.split("\n");
-            let addedLogs = 0; let addedKeys = 0;
-            let header = lines[0].toLowerCase();
-
-            for (let i = 1; i < lines.length; i++) {
-                let line = lines[i].trim();
-                if (!line) continue;
-                let cols = line.split(",");
-
-                // ၁။ KEY BACKUP ဖိုင် ဖြစ်နေလျှင်
-                if (header.includes("configurl") || header.includes("limit")) {
-                    let kName = cols[0]?.trim() || "";
-                    let kContent = cols[1]?.trim() || "";
-                    let kLimit = parseInt(cols[2]?.trim()) || 10;
-                    if(!keys.find(k => k.name === kName)) {
-                        keys.push({ id: Date.now() + Math.random(), name: kName, content: kContent, limit: kLimit, used: 0 });
-                        addedKeys++;
-                    }
-                } 
-                // ၂။ USER LOGS ဖိုင် ဖြစ်နေလျှင်
-                else if (cols.length >= 4) {
-                    let dateVal = cols[0].trim();
-                    let keyName = cols[2].trim();
-                    let userName = cols[3].trim();
-                    if(!logs.some(l => l.date === dateVal && l.user === userName && l.key === keyName)) {
-                        logs.push({ id: Date.now()+Math.random(), date: dateVal, time: cols[1].trim(), key: keyName, user: userName, duration: cols[1].trim() });
+                for (let i = 1; i < lines.length; i++) {
+                    let cols = lines[i].trim().split(",");
+                    if (header.includes("configurl") || header.includes("limit")) {
+                        let kName = cols[0]?.trim();
+                        if(kName && !keys.find(x => x.name === kName)) {
+                            keys.push({ id: Date.now()+i, name: kName, content: cols[1], limit: parseInt(cols[2])||10, used: 0 });
+                            addedKeys++;
+                        }
+                    } else if (cols.length >= 4) {
+                        logs.push({ id: Date.now()+i, date: cols[0], time: cols[1], key: cols[2], user: cols[3], duration: cols[1] });
                         addedLogs++;
                     }
                 }
-            }
-            // Used Count ပြန်ညှိခြင်း
-            keys.forEach(k => { k.used = logs.filter(l => l.key === k.name).length; });
-            
-            if (addedLogs > 0 || addedKeys > 0) {
+                keys.forEach(k => k.used = logs.filter(l => l.key === k.name).length);
                 saveData();
-                iosAlert("✅ Import Success", `Keys (${addedKeys}) နှင့် Logs (${addedLogs}) ကို ထည့်သွင်းပြီးပါပြီ။`);
+                alert(`Imported ${addedKeys} Keys and ${addedLogs} Logs!`);
+            };
+            reader.readAsText(file);
+        }
+
+        // ၅။ Utilities
+        function exportData() {
+            let csv = "Date,Time,Key,User\n" + logs.map(l => `${l.date},${l.time},${l.key},${l.user}`).join("\n");
+            let blob = new Blob([csv], { type: 'text/csv' });
+            let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'VPN_Backup.csv'; a.click();
+        }
+
+        function renderLogs() {
+            let search = document.getElementById('searchBox').value.toLowerCase();
+            let filtered = logs.filter(l => l.user.toLowerCase().includes(search) || l.key.toLowerCase().includes(search));
+            document.getElementById('logs-body').innerHTML = filtered.reverse().map(l => `
+                <tr>
+                    <td>${l.date}</td>
+                    <td>${l.key}</td>
+                    <td>${l.user}</td>
+                    <td style="color:var(--ios-red); font-weight:bold;">${l.duration}</td>
+                    <td><i class="bi bi-trash" onclick="deleteLog(${l.id})" style="cursor:pointer; color:var(--ios-red);"></i></td>
+                </tr>
+            `).join('');
+        }
+
+        function saveData() {
+            localStorage.setItem('vpn_keys_pro', JSON.stringify(keys));
+            localStorage.setItem('vpn_logs_pro', JSON.stringify(logs));
+            renderAll();
+        }
+
+        function deleteLog(id) {
+            let log = logs.find(x => x.id === id);
+            let k = keys.find(x => x.name === log.key);
+            if(k && k.used > 0) k.used--;
+            logs = logs.filter(x => x.id !== id);
+            saveData();
+        }
+
+        function deleteKey() {
+            keys = keys.filter(x => x.id !== activeKeyId);
+            saveData(); closeModal();
+        }
+
+        function closeModal() { document.getElementById('keyModal').style.display = 'none'; }
+        
+        function openAddKeyModal() {
+            let name = prompt("Enter Key Name:");
+            let url = prompt("Enter Config URL:");
+            let limit = prompt("Enter Limit (number):");
+            if(name && url && limit) {
+                keys.push({ id: Date.now(), name: name, content: url, limit: parseInt(limit), used: 0 });
+                saveData();
             }
-        };
-        reader.readAsText(file);
-    }
-
-    function exportData() {
-        let csv = "Date,Time,Key,User\n" + logs.map(l => `${l.date},${l.time},${l.key},${l.user}`).join("\n");
-        let blob = new Blob([csv], { type: 'text/csv' });
-        let url = URL.createObjectURL(blob);
-        let a = document.createElement('a');
-        a.href = url; a.download = 'VPN_Backup.csv'; a.click();
-    }
-
-    function renderLogs() {
-        let search = document.getElementById('searchBox').value.toLowerCase();
-        let filtered = logs.filter(l => l.user.toLowerCase().includes(search) || l.key.toLowerCase().includes(search));
-        document.getElementById('logs-body').innerHTML = filtered.reverse().map(l => `
-            <tr>
-                <td>${l.date}</td>
-                <td>${l.key}</td>
-                <td>${l.user}</td>
-                <td style="color:#ff3b30; font-weight:bold;">${l.duration}</td>
-                <td><i class="bi bi-trash" onclick="deleteLog(${l.id})" style="color:var(--ios-red); cursor:pointer;"></i></td>
-            </tr>
-        `).join('');
-    }
-
-    function deleteLog(id) {
-        let log = logs.find(x => x.id === id);
-        let k = keys.find(x => x.name === log.key);
-        if(k && k.used > 0) k.used--;
-        logs = logs.filter(x => x.id !== id);
-        saveData();
-    }
-
-    function deleteKey() {
-        keys = keys.filter(x => x.id !== activeKeyId);
-        saveData();
-        closeModal();
-    }
-
-    function saveData() {
-        localStorage.setItem('vpn_keys', JSON.stringify(keys));
-        localStorage.setItem('vpn_logs', JSON.stringify(logs));
-        renderAll();
-        updateStats();
-    }
-
-    function closeModal() { document.getElementById('keyModal').style.display = 'none'; }
-    
-    updateStats();
-</script>
+        }
+    </script>
 </body>
 </html>
