@@ -1,384 +1,336 @@
 <!DOCTYPE html>
-<html lang="eng">
+<html lang="my">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>iOS 2026 VPN Manager Pro</title>
-    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>iOS Style VPN Manager</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="bootstrap-icons.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     
     <style>
+        /* အစ်ကို့ရဲ့ မူရင်း iOS Style CSS များ */
         :root {
-            --ios-blur: blur(45px) saturate(180%);
+            --ios-blur: blur(40px) saturate(180%);
             --ios-blue: #007AFF;
             --ios-red: #FF3B30;
-            --ios-amber: #FF9F0A;
-            --ios-green: #32D74B;
             --glass-bg: rgba(255, 255, 255, 0.08);
-            --glass-border: rgba(255, 255, 255, 0.25);
-            --text-main: #FFFFFF;
-            --text-muted: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.2);
         }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-            color: var(--text-main);
+            background: #000;
+            color: white;
             min-height: 100vh;
-            background: radial-gradient(at 0% 0%, #1e1b4b 0%, transparent 55%),
-                        radial-gradient(at 100% 0%, #312e81 0%, transparent 55%),
-                        radial-gradient(at 50% 100%, #4c1d95 0%, transparent 100%),
-                        #020617;
-            background-attachment: fixed;
-            display: flex; justify-content: center; padding: 20px;
+            background: radial-gradient(circle at top right, #1e1b4b, #020617);
         }
 
-        .orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.35; filter: blur(70px); }
-        .orb { position: absolute; width: 400px; height: 400px; border-radius: 50%; animation: float 18s infinite alternate ease-in-out; }
-        .orb:nth-child(1) { background: #5ec8ff; left: 5%; top: 5%; }
-        .orb:nth-child(2) { background: #b08cff; right: 5%; top: 5%; animation-delay: -5s; }
-        @keyframes float { 0% { transform: translate(0,0); } 100% { transform: translate(30px, 50px); } }
+        .container { padding: 20px; max-width: 900px; margin: auto; }
 
-        .container { width: 100%; max-width: 950px; position: relative; z-index: 1; }
-
+        /* iOS Glassmorphism Panel */
         .glass-panel {
             background: var(--glass-bg);
             backdrop-filter: var(--ios-blur);
             -webkit-backdrop-filter: var(--ios-blur);
             border: 1px solid var(--glass-border);
-            border-radius: 28px; padding: 25px; margin-bottom: 25px;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
         }
 
+        /* အစ်ကို့ရဲ့ Glossy Buttons များ */
         .glass-btn {
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: white; padding: 12px 20px; border-radius: 16px; font-weight: 600; cursor: pointer;
-            display: inline-flex; align-items: center; justify-content: center; transition: 0.2s;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .glass-btn:active { transform: scale(0.96); opacity: 0.8; }
-        .full-btn { width: 100%; height: 50px; margin-bottom: 10px; font-size: 16px; }
+
         .btn-blue { background: var(--ios-blue); border: none; }
         .btn-cyan { background: rgba(0, 255, 255, 0.15) !important; border: 1px solid rgba(0, 255, 255, 0.5) !important; color: #00ffff !important; }
         .btn-pink { background: rgba(255, 105, 180, 0.15) !important; border: 1px solid rgba(255, 105, 180, 0.5) !important; color: #ff69b4 !important; }
-        .btn-red-glossy { background: linear-gradient(135deg, rgba(255, 59, 48, 0.8) 0%, rgba(255, 59, 48, 0.4) 100%) !important; border: 1px solid rgba(255, 255, 255, 0.3) !important; box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3); }
+        .btn-red-glossy { background: linear-gradient(180deg, #ff5f57, #ff3b30); border: none; box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3); }
 
-        input { width: 100%; padding: 15px; border-radius: 15px; border: 1px solid var(--glass-border); background: rgba(255, 255, 255, 0.15); color: #FFFFFF; outline: none; margin-bottom: 12px; font-size: 16px; }
-        input:focus { border-color: var(--ios-blue); }
-        .is-invalid { border: 1px solid #ff3b30 !important; background: rgba(255, 59, 48, 0.1) !important; }
+        .full-btn { width: 100%; margin-top: 10px; }
 
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(35px) saturate(160%); display: none; align-items: center; justify-content: center; z-index: 2000; }
-        .modal-box { width: 90%; max-width: 360px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 32px; padding: 25px; text-align: center; }
-        .qr-holder { background: #fff; padding: 12px; border-radius: 20px; display: inline-block; margin-bottom: 20px; }
+        /* Table Styling */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 16px;
+            margin-top: 15px;
+        }
 
-        .table-responsive { width: 100%; overflow-x: auto; background: rgba(0, 0, 0, 0.2); border-radius: 20px; border: 1px solid var(--glass-border); margin-top: 10px; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th { text-align: left; padding: 18px 15px; color: #fff; font-size: 13px; font-weight: 800; border-bottom: 2px solid var(--glass-border); }
-        td { padding: 16px 15px; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 14px; text-align: center; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.03);
+            min-width: 500px;
+        }
+
+        th { background: rgba(255, 255, 255, 0.05); padding: 12px; text-align: center; font-size: 13px; color: var(--ios-blue); }
+        td { padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); text-align: center; font-size: 14px; }
+
+        /* Modal / Alert Styling */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 1000;
+        }
+
+        .modal-box {
+            background: rgba(30, 30, 30, 0.85);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 24px; padding: 25px; width: 90%; max-width: 340px; text-align: center;
+        }
+
+        input {
+            width: 100%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+            padding: 12px; border-radius: 12px; color: white; margin-bottom: 10px; outline: none;
+        }
+
+        .qr-holder { background: white; padding: 10px; border-radius: 15px; display: inline-block; margin: 15px 0; }
     </style>
 </head>
-<body onload="initApp()">
-
-<div class="orbs"><div class="orb"></div><div class="orb"></div></div>
+<body>
 
 <div class="container">
     <div id="mainPage">
         <div class="glass-panel" style="text-align: center;">
-            <h2 style="margin-bottom: 30px;">VPN Manager <span style="font-weight: 800; color: var(--ios-blue);">PRO</span></h2>
-            <div style="display: flex; justify-content: space-around; margin-bottom: 40px;">
-                <div><span id="statKeys" style="font-size: 45px; font-weight: 800; color: #00e600;">0</span><br><small>KEYS</small></div>
-                <div><span id="statUsers" style="font-size: 45px; font-weight: 800; color: #ff0066;">0</span><br><small>LOGS</small></div>
+            <h2 style="margin-bottom: 25px;">VPN Dashboard</h2>
+            <div style="display: flex; justify-content: space-around; margin-bottom: 25px;">
+                <div><span id="statKeys" style="font-size: 32px; font-weight: bold; color: #00ff00;">0</span><br><small>Total Keys</small></div>
+                <div><span id="statLogs" style="font-size: 32px; font-weight: bold; color: #ff3b30;">0</span><br><small>Total Logs</small></div>
             </div>
-            <button onclick="showAdminPage()" class="glass-btn btn-blue full-btn">OPEN ADMIN PANEL</button>
+            <button onclick="showAdmin()" class="glass-btn btn-blue full-btn">ADMIN PANEL</button>
         </div>
     </div>
 
-    <div id="adminPage" style="display:none">
+    <div id="adminPage" style="display:none;">
         <div class="glass-panel">
-            <button onclick="showMain()" class="glass-btn" style="margin-bottom: 20px;"><i class="bi bi-chevron-left"></i> BACK</button>
-            
-            <div id="loginBox" style="max-width: 400px; margin: 0 auto; text-align: center;">
-                <h5 style="margin-bottom: 25px;">Authentication Required</h5>
-                <input type="password" id="adminPass" placeholder="Admin Password" style="text-align: center;">
-                <button onclick="login()" class="glass-btn btn-blue full-btn">LOGIN</button>
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <button onclick="showHome()" class="glass-btn"><i class="bi bi-arrow-left"></i> BACK</button>
+                <div>
+                    <button onclick="exportData()" class="glass-btn btn-pink">Export</button>
+                    <button onclick="document.getElementById('importFile').click()" class="glass-btn btn-cyan">Import</button>
+                    <input type="file" id="importFile" style="display:none" onchange="importData(event)">
+                </div>
             </div>
 
-            <div id="adminPanel" style="display:none">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h5 style="margin:0;">INVENTORY</h5>
-                    <div style="display: flex; gap: 8px;">
-                        <button onclick="exportData()" class="glass-btn btn-pink" style="padding: 8px 15px; font-size: 12px;">EXP</button>
-                        <button onclick="document.getElementById('importFile').click()" class="glass-btn btn-cyan" style="padding: 8px 15px; font-size: 12px;">IMP</button>
-                        <input type="file" id="importFile" accept=".csv" style="display:none" onchange="importData(event)">
-                        <button onclick="toggleAddForm()" class="glass-btn btn-blue" style="padding: 8px 15px; font-size: 12px;">+ NEW KEY</button>
-                    </div>
-                </div>
+            <h5 style="color: var(--ios-blue);">AVAILABLE KEYS</h5>
+            <div id="keys-container" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px;"></div>
 
-                <div id="addKeyForm" style="display:none; margin-bottom: 20px;">
-                    <input type="text" id="keyName" placeholder="Key Name">
-                    <input type="text" id="keyContent" placeholder="Config URL">
-                    <input type="number" id="keyLimit" placeholder="Usage Limit">
-                    <button onclick="addKey()" class="glass-btn btn-blue full-btn">CREATE KEY</button>
-                </div>
-
-                <div id="adminKeysList" style="display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 35px;"></div>
-
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h5 style="margin:0;">USAGE LOGS</h5>
-                    <input type="text" id="searchBox" placeholder="🔍 Search..." onkeyup="searchLogs()" style="width: 150px; margin:0; padding: 10px; border-radius: 20px;">
-                </div>
-
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr><th>NO</th><th>DATE</th><th>TIME</th><th>KEY</th><th>USER</th><th>ACTION</th></tr>
-                        </thead>
-                        <tbody id="logs-body"></tbody>
-                    </table>
-                </div>
+            <div style="display:flex; justify-content: space-between; align-items: center;">
+                <h5>USAGE LOGS</h5>
+                <input type="text" id="searchBox" placeholder="Search..." onkeyup="renderLogs()" style="width: 120px; margin: 0; padding: 5px 10px;">
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr><th>DATE</th><th>KEY</th><th>USER</th><th>TIME</th><th>ACTION</th></tr>
+                    </thead>
+                    <tbody id="logs-body"></tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 
-<div id="modalOverlay" class="modal-overlay" onclick="closeAllModals()">
-    <div id="keyModal" class="modal-box" onclick="event.stopPropagation()">
-        <div id="nameDisplayContainer" style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
-            <h3 id="modalKeyName" style="margin: 0; color: #00ffff; cursor: pointer;" onclick="enableNameEdit()"></h3>
-            <i class="bi bi-pencil-square" onclick="enableNameEdit()" style="color: #ffff00; cursor: pointer;"></i>
-        </div>
-        <input type="text" id="editKeyNameInput" style="display: none; text-align: center;">
+<div id="keyModal" class="modal-overlay" onclick="closeModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <h3 id="modalKeyName" style="color: var(--ios-blue); margin: 0;"></h3>
+        <div class="qr-holder"><div id="qrcode"></div></div>
         
-        <div class="qr-holder"><div id="modalQR"></div></div>
-        
-        <div style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 15px; display: flex; justify-content: space-around; margin-bottom: 15px;">
-            <div>Limit<br><b id="mTotal" style="color:#00ffff;"></b></div>
-            <div>Used<br><b id="mUsed" style="color:#ffff00;"></b></div>
-            <div>Left<br><b id="mLeft" style="color:#00ff00;"></b></div>
+        <div style="display:flex; justify-content: space-between; font-size: 13px; margin-bottom: 15px;">
+            <span>Limit: <b id="mTotal"></b></span>
+            <span>Used: <b id="mUsed"></b></span>
+            <span>Left: <b id="mLeft" style="color: #00ff00;"></b></span>
         </div>
 
-        <input type="text" id="deviceInput" placeholder="User Name">
-        <input type="number" id="timeInput" placeholder="Duration">
-        <button onclick="registerUsage()" class="glass-btn btn-blue full-btn">REGISTER & SAVE</button>
-        <div style="display: flex; gap: 10px;">
-            <button onclick="closeAllModals()" class="glass-btn" style="flex:1;">Cancel</button>
-            <button onclick="triggerFullDelete()" class="glass-btn btn-red-glossy" style="flex:1;">Delete</button>
-        </div>
-    </div>
-
-    <div id="editModal" class="modal-box" onclick="event.stopPropagation()">
-        <h3>Edit Entry</h3>
-        <input type="text" id="editDeviceInput" placeholder="User Name">
-        <input type="number" id="editTimeInput" placeholder="Duration">
-        <div style="display: flex; gap: 10px;">
-            <button onclick="closeAllModals()" class="glass-btn" style="flex:1;">Cancel</button>
-            <button onclick="saveEditLog()" class="glass-btn btn-blue" style="flex:1;">Update</button>
-        </div>
-    </div>
-
-    <div id="alertModal" class="modal-box" onclick="event.stopPropagation()">
-        <h3 id="alertTitle">Alert</h3>
-        <p id="alertMsg" style="font-size: 14px; opacity: 0.8;"></p>
-        <div style="display: flex; gap: 12px;">
-            <button onclick="closeAllModals()" class="glass-btn" style="flex:1;" id="alertCancelBtn">Cancel</button>
-            <button id="alertConfirmBtn" class="glass-btn btn-red-glossy" style="flex:1;">Confirm</button>
-        </div>
+        <input type="text" id="userName" placeholder="User Name">
+        <input type="text" id="duration" placeholder="Duration (e.g. 1 Month)">
+        <button onclick="saveLog()" class="glass-btn btn-blue full-btn">REGISTER USAGE</button>
+        <button onclick="deleteKey()" class="glass-btn btn-red-glossy full-btn" style="margin-top: 15px;">DELETE KEY</button>
     </div>
 </div>
 
 <script>
-    const tg = window.Telegram.WebApp;
-    const ADMIN_PASSWORD = "admin123";
-    let keys = JSON.parse(localStorage.getItem("sys_keys")) || [];
-    let logs = JSON.parse(localStorage.getItem("sys_logs")) || [];
-    let currentKeyId = null, currentLogIndex = null;
+    let keys = JSON.parse(localStorage.getItem('vpn_keys')) || [];
+    let logs = JSON.parse(localStorage.getItem('vpn_logs')) || [];
+    let activeKeyId = null;
 
-    function initApp() {
-        tg.expand();
-        tg.ready();
+    // အစ်ကို့ရဲ့ iosAlert မူရင်း Function
+    function iosAlert(title, msg) {
+        alert(title + "\n\n" + msg); // ရိုးရှင်းအောင် alert သုံးထားပါတယ်၊ လိုအပ်ရင် modal နဲ့ ပြောင်းလို့ရပါတယ်
+    }
+
+    function showAdmin() { 
+        document.getElementById('mainPage').style.display = 'none';
+        document.getElementById('adminPage').style.display = 'block';
+        renderAll();
+    }
+
+    function showHome() {
+        document.getElementById('adminPage').style.display = 'none';
+        document.getElementById('mainPage').style.display = 'block';
         updateStats();
     }
 
-    function showAdminPage() { document.getElementById("mainPage").style.display = "none"; document.getElementById("adminPage").style.display = "block"; }
-    function showMain() { updateStats(); document.getElementById("adminPage").style.display = "none"; document.getElementById("mainPage").style.display = "block"; }
-    function updateStats() { document.getElementById("statKeys").textContent = keys.length; document.getElementById("statUsers").textContent = logs.length; }
-
-    function iosAlert(title, msg, onConfirm = null) {
-        document.getElementById("alertTitle").textContent = title;
-        document.getElementById("alertMsg").textContent = msg;
-        const cBtn = document.getElementById("alertConfirmBtn");
-        if(onConfirm) {
-            cBtn.style.display="block";
-            cBtn.onclick= () => { onConfirm(); closeAllModals(); };
-            document.getElementById("alertCancelBtn").textContent = "Cancel";
-        } else {
-            cBtn.style.display="none";
-            document.getElementById("alertCancelBtn").textContent = "OK";
-        }
-        showModal("alertModal");
+    function updateStats() {
+        document.getElementById('statKeys').innerText = keys.length;
+        document.getElementById('statLogs').innerText = logs.length;
     }
 
-    function login() {
-        if(document.getElementById("adminPass").value === ADMIN_PASSWORD) {
-            document.getElementById("loginBox").style.display = "none";
-            document.getElementById("adminPanel").style.display = "block";
-            renderAll();
-        } else { iosAlert("⚠️ Access Denied", "Incorrect Password!"); }
-    }
-
-    function toggleAddForm() {
-        let f = document.getElementById("addKeyForm");
-        f.style.display = (f.style.display === "none") ? "block" : "none";
-    }
-
-    function addKey() {
-        let n = document.getElementById("keyName"), c = document.getElementById("keyContent"), l = document.getElementById("keyLimit");
-        if(!n.value || !c.value || !l.value) return;
-        keys.push({ id: Date.now(), name: n.value, content: c.value, limit: parseInt(l.value), used: 0 });
-        saveData(); toggleAddForm();
-    }
-
-    function renderAll(search = "") {
-        const kList = document.getElementById("adminKeysList");
-        kList.innerHTML = "";
+    function renderAll() {
+        const kContainer = document.getElementById('keys-container');
+        kContainer.innerHTML = '';
         keys.forEach(k => {
-            let percent = (k.used / k.limit) * 100;
-            let color = percent >= 100 ? "#666" : percent >= 80 ? "#ff0000" : "#00ff00";
-            let btn = document.createElement("div");
-            btn.className = "glass-btn";
-            btn.style.borderLeft = `5px solid ${color}`;
-            btn.innerHTML = `${k.name} <small style="margin-left:5px; opacity:0.6;">${k.used}/${k.limit}</small>`;
-            btn.onclick = () => openKeyModal(k.id);
-            kList.appendChild(btn);
+            let btn = document.createElement('button');
+            btn.className = 'glass-btn';
+            btn.innerHTML = `<i class="bi bi-key"></i> ${k.name} (${k.used}/${k.limit})`;
+            btn.onclick = () => openKey(k.id);
+            kContainer.appendChild(btn);
         });
-
-        let filtered = logs.filter(l => l.key.toLowerCase().includes(search.toLowerCase()) || l.device.toLowerCase().includes(search.toLowerCase()));
-        document.getElementById("logs-body").innerHTML = filtered.map((l, idx) => `
-            <tr>
-                <td>${idx+1}</td>
-                <td>${l.date.split(',')[0]}</td>
-                <td><span style="color:#ff0066; font-weight:bold;">${l.time}</span></td>
-                <td>${l.key}</td>
-                <td>${l.device}</td>
-                <td>
-                    <i class="bi bi-pencil-square" onclick="openEditModal(${logs.indexOf(l)})" style="color:#ffc107; margin-right:10px;"></i>
-                    <i class="bi bi-trash" onclick="confirmDeleteLog(${logs.indexOf(l)})" style="color:#ff3b30;"></i>
-                </td>
-            </tr>
-        `).join("");
+        renderLogs();
     }
 
-    function openKeyModal(id) {
-        currentKeyId = id;
+    function openKey(id) {
+        activeKeyId = id;
         let k = keys.find(x => x.id === id);
-        document.getElementById("modalKeyName").innerText = k.name;
-        document.getElementById("mTotal").textContent = k.limit;
-        document.getElementById("mUsed").textContent = k.used;
-        document.getElementById("mLeft").textContent = k.limit - k.used;
-        document.getElementById("modalQR").innerHTML = "";
-        new QRCode(document.getElementById("modalQR"), { text: k.content, width: 140, height: 140 });
-        showModal("keyModal");
+        document.getElementById('modalKeyName').innerText = k.name;
+        document.getElementById('mTotal').innerText = k.limit;
+        document.getElementById('mUsed').innerText = k.used;
+        document.getElementById('mLeft').innerText = k.limit - k.used;
+        
+        document.getElementById('qrcode').innerHTML = "";
+        new QRCode(document.getElementById("qrcode"), { text: k.content, width: 150, height: 150 });
+        
+        document.getElementById('keyModal').style.display = 'flex';
     }
 
-    function enableNameEdit() {
-        const h3 = document.getElementById('modalKeyName'), container = document.getElementById('nameDisplayContainer'), input = document.getElementById('editKeyNameInput');
-        input.value = h3.innerText;
-        container.style.display = 'none'; input.style.display = 'block'; input.focus();
-        input.onblur = () => {
-            if(input.value.trim()) {
-                let k = keys.find(x => x.id === currentKeyId);
-                k.name = input.value; saveData();
-                h3.innerText = input.value;
-            }
-            container.style.display = 'flex'; input.style.display = 'none';
-        };
-    }
+    function saveLog() {
+        let user = document.getElementById('userName').value;
+        let time = document.getElementById('duration').value;
+        if(!user || !time) return;
 
-    function registerUsage() {
-        let dev = document.getElementById("deviceInput").value, time = document.getElementById("timeInput").value;
-        let k = keys.find(x => x.id === currentKeyId);
-        if(!dev || !time || k.used >= k.limit) return;
+        let k = keys.find(x => x.id === activeKeyId);
+        if(k.used >= k.limit) return iosAlert("⚠️ Limit Full", "This key has reached its limit.");
+
         k.used++;
-        logs.push({ date: new Date().toLocaleDateString('en-GB') + ", " + new Date().toLocaleTimeString(), key: k.name, device: dev, time: time });
-        saveData(); closeAllModals();
-    }
-
-    function openEditModal(idx) {
-        currentLogIndex = idx;
-        document.getElementById("editDeviceInput").value = logs[idx].device;
-        document.getElementById("editTimeInput").value = logs[idx].time;
-        showModal("editModal");
-    }
-
-    function saveEditLog() {
-        logs[currentLogIndex].device = document.getElementById("editDeviceInput").value;
-        logs[currentLogIndex].time = document.getElementById("editTimeInput").value;
-        saveData(); closeAllModals();
-    }
-
-    function confirmDeleteLog(idx) {
-        iosAlert("⚠️ Delete?", "Remove this log?", () => {
-            let k = keys.find(x => x.name === logs[idx].key);
-            if(k && k.used > 0) k.used--;
-            logs.splice(idx, 1); saveData();
+        logs.push({
+            id: Date.now(),
+            date: new Date().toLocaleDateString('en-GB'),
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            key: k.name,
+            user: user,
+            duration: time
         });
+
+        saveData();
+        closeModal();
     }
 
-    function triggerFullDelete() {
-        iosAlert("⚠️ Delete Key?", "Remove key and all logs?", () => {
-            let k = keys.find(x => x.id === currentKeyId);
-            logs = logs.filter(l => l.key !== k.name);
-            keys = keys.filter(x => x.id !== currentKeyId);
-            saveData(); closeAllModals();
-        });
-    }
-
-    function exportData() {
-        let csvLogs = "Date,Time,KeyName,UserDevice\n" + logs.map(l => `${l.date},${l.time},${l.key},${l.device}`).join("\n");
-        let csvKeys = "KeyName,ConfigURL,Limit,Used\n" + keys.map(k => `${k.name},${k.content},${k.limit},${k.used}`).join("\n");
-        downloadFile(csvLogs, "vpn_logs.csv");
-        setTimeout(() => downloadFile(csvKeys, "vpn_keys.csv"), 500);
-    }
-
-    function downloadFile(content, fileName) {
-        let blob = new Blob([content], { type: 'text/csv' });
-        let a = document.createElement("a");
-        a.href = URL.createObjectURL(blob); a.download = fileName; a.click();
-    }
-
+    // --- အပိုင်း ၂ (Import Logic) အစ်ကိုပို့ထားတဲ့ ကုဒ်အတိုင်း ---
     function importData(event) {
         let file = event.target.files[0];
         if (!file) return;
         let reader = new FileReader();
-        reader.onload = (e) => {
-            let lines = e.target.result.split("\n"), header = lines[0].toLowerCase();
+        reader.onload = function(e) {
+            let content = e.target.result;
+            let lines = content.split("\n");
+            let addedLogs = 0; let addedKeys = 0;
+            let header = lines[0].toLowerCase();
+
             for (let i = 1; i < lines.length; i++) {
-                let cols = lines[i].split(","); if(cols.length < 3) continue;
-                if(header.includes("configurl")) {
-                    keys.push({ id: Date.now()+i, name: cols[0], content: cols[1], limit: parseInt(cols[2]), used: parseInt(cols[3]) || 0 });
-                } else {
-                    logs.push({ date: cols[0], time: cols[1], key: cols[2], device: cols[3] });
+                let line = lines[i].trim();
+                if (!line) continue;
+                let cols = line.split(",");
+
+                // ၁။ KEY BACKUP ဖိုင် ဖြစ်နေလျှင်
+                if (header.includes("configurl") || header.includes("limit")) {
+                    let kName = cols[0]?.trim() || "";
+                    let kContent = cols[1]?.trim() || "";
+                    let kLimit = parseInt(cols[2]?.trim()) || 10;
+                    if(!keys.find(k => k.name === kName)) {
+                        keys.push({ id: Date.now() + Math.random(), name: kName, content: kContent, limit: kLimit, used: 0 });
+                        addedKeys++;
+                    }
+                } 
+                // ၂။ USER LOGS ဖိုင် ဖြစ်နေလျှင်
+                else if (cols.length >= 4) {
+                    let dateVal = cols[0].trim();
+                    let keyName = cols[2].trim();
+                    let userName = cols[3].trim();
+                    if(!logs.some(l => l.date === dateVal && l.user === userName && l.key === keyName)) {
+                        logs.push({ id: Date.now()+Math.random(), date: dateVal, time: cols[1].trim(), key: keyName, user: userName, duration: cols[1].trim() });
+                        addedLogs++;
+                    }
                 }
             }
-            keys.forEach(k => k.used = logs.filter(l => l.key === k.name).length);
-            saveData(); iosAlert("✅ Success", "Data Imported!");
+            // Used Count ပြန်ညှိခြင်း
+            keys.forEach(k => { k.used = logs.filter(l => l.key === k.name).length; });
+            
+            if (addedLogs > 0 || addedKeys > 0) {
+                saveData();
+                iosAlert("✅ Import Success", `Keys (${addedKeys}) နှင့် Logs (${addedLogs}) ကို ထည့်သွင်းပြီးပါပြီ။`);
+            }
         };
         reader.readAsText(file);
     }
 
-    function saveData() {
-        localStorage.setItem("sys_keys", JSON.stringify(keys));
-        localStorage.setItem("sys_logs", JSON.stringify(logs));
-        renderAll(); updateStats();
+    function exportData() {
+        let csv = "Date,Time,Key,User\n" + logs.map(l => `${l.date},${l.time},${l.key},${l.user}`).join("\n");
+        let blob = new Blob([csv], { type: 'text/csv' });
+        let url = URL.createObjectURL(blob);
+        let a = document.createElement('a');
+        a.href = url; a.download = 'VPN_Backup.csv'; a.click();
     }
 
-    function showModal(id) { document.getElementById("modalOverlay").style.display = "flex"; document.querySelectorAll(".modal-box").forEach(m => m.style.display = "none"); document.getElementById(id).style.display = "block"; }
-    function closeAllModals() { document.getElementById("modalOverlay").style.display = "none"; }
-    function searchLogs() { renderAll(document.getElementById("searchBox").value); }
+    function renderLogs() {
+        let search = document.getElementById('searchBox').value.toLowerCase();
+        let filtered = logs.filter(l => l.user.toLowerCase().includes(search) || l.key.toLowerCase().includes(search));
+        document.getElementById('logs-body').innerHTML = filtered.reverse().map(l => `
+            <tr>
+                <td>${l.date}</td>
+                <td>${l.key}</td>
+                <td>${l.user}</td>
+                <td style="color:#ff3b30; font-weight:bold;">${l.duration}</td>
+                <td><i class="bi bi-trash" onclick="deleteLog(${l.id})" style="color:var(--ios-red); cursor:pointer;"></i></td>
+            </tr>
+        `).join('');
+    }
+
+    function deleteLog(id) {
+        let log = logs.find(x => x.id === id);
+        let k = keys.find(x => x.name === log.key);
+        if(k && k.used > 0) k.used--;
+        logs = logs.filter(x => x.id !== id);
+        saveData();
+    }
+
+    function deleteKey() {
+        keys = keys.filter(x => x.id !== activeKeyId);
+        saveData();
+        closeModal();
+    }
+
+    function saveData() {
+        localStorage.setItem('vpn_keys', JSON.stringify(keys));
+        localStorage.setItem('vpn_logs', JSON.stringify(logs));
+        renderAll();
+        updateStats();
+    }
+
+    function closeModal() { document.getElementById('keyModal').style.display = 'none'; }
+    
+    updateStats();
 </script>
 </body>
 </html>
